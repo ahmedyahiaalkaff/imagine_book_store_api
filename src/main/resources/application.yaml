@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: imagine_book_store
+
+server:
+  port: 8080
+  servlet:
+    context-path: /api/v1
+
+security:
+  jwt:
+    token:
+      security-key: ${JWT_SECRET}

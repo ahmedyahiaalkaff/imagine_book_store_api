@@ -1,7 +1,0 @@
-package com.imagine.imagine_book_store;
-
-public class BookNotFoundException extends RuntimeException{
-  public BookNotFoundException(Long id){
-    super("Could not find Book with id: "+id);
-  }
-}
