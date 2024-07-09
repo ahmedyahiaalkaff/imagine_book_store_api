@@ -4,3 +4,4 @@ mvnw.cmd*
 /build*
 .DS_Store*
 .vscode*
+.env

@@ -1,4 +1,4 @@
-package com.imagine.imagine_book_store;
+package com.imagine.imagine_book_store.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
 public class BookNotFoundAdvice {
-
   @ExceptionHandler(BookNotFoundException.class)
   @ResponseStatus(HttpStatus.NOT_FOUND)
   String handleBookNotFound(BookNotFoundException ex){

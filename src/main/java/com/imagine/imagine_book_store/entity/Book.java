@@ -1,4 +1,4 @@
-package com.imagine.imagine_book_store;
+package com.imagine.imagine_book_store.entity;
 
 import lombok.Data;
 
@@ -16,7 +16,6 @@ public class Book {
   private double price;
 
   public Book(){
-    
   }
 
   public Book(String title, String author, String genre, double price){
