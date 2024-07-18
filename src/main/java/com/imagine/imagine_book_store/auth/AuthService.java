@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import com.imagine.imagine_book_store.dtos.UserSignupDTO;
 import com.imagine.imagine_book_store.entity.User;
 import com.imagine.imagine_book_store.enums.UserRole;
+import com.imagine.imagine_book_store.exception.InvalidRequestException;
 import com.imagine.imagine_book_store.repository.UserRepository;
 
 @Service
@@ -23,7 +24,11 @@ public class AuthService implements UserDetailsService{
     return userRepository.findByEmail(username);
   }
 
-  public UserDetails signup(UserSignupDTO userData){
+  public UserDetails signup(UserSignupDTO userData) throws InvalidRequestException{
+    User user = userRepository.findByEmail(userData.email());
+    if(user != null){
+      throw new InvalidRequestException("Email already exists");
+    }
     String encryptedPassword = new BCryptPasswordEncoder().encode(userData.password());
     User newUser = new User();
     newUser.setEmail(userData.email());
