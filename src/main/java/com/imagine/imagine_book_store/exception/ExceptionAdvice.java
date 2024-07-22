@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -51,10 +52,16 @@ public class ExceptionAdvice {
     return Map.of("error", ex.getMessage());
   }
 
+  @ExceptionHandler(BadCredentialsException.class)
+  @ResponseStatus(HttpStatus.UNAUTHORIZED)
+  Map<String, String> handleBadCredentialsException(BadCredentialsException ex) {
+    return Map.of("error", ex.getMessage());
+  }
 
   @ExceptionHandler(Exception.class)
   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
   Map<String, String> handleException(Exception ex) {
+    ex.printStackTrace();
     return Map.of("error", "internal server error");
   }
 
