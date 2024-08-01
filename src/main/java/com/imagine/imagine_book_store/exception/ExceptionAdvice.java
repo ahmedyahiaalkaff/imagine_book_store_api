@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
@@ -58,9 +59,15 @@ public class ExceptionAdvice {
     return Map.of("error", ex.getMessage());
   }
 
-  @ExceptionHandler(Exception.class)
+  @ExceptionHandler(AccessDeniedException.class)
+  @ResponseStatus(HttpStatus.FORBIDDEN)
+  Map<String, String> handleAccessDeniedException(AccessDeniedException ex) {
+    return Map.of("error", ex.getMessage());
+  }
+
+  @ExceptionHandler({Exception.class, NullPointerException.class})
   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-  Map<String, String> handleException(Exception ex) {
+  Map<String, String> handleException(Throwable ex) {
     ex.printStackTrace();
     return Map.of("error", "internal server error");
   }

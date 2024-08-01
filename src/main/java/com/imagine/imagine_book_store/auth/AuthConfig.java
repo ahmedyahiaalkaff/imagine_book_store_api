@@ -26,8 +26,9 @@ public class AuthConfig {
         .csrf(csrf -> csrf.disable())
         .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .authorizeHttpRequests(authorize -> authorize
+            .requestMatchers("/shopping-cart/**").hasRole("USER")
+            .requestMatchers("/books/**").hasRole("ADMIN")
             .requestMatchers("/**").permitAll()
-            .requestMatchers("/**").hasRole("ADMIN")
             .anyRequest().authenticated())
         .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class).build();
   }
