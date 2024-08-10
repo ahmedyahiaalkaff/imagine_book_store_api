@@ -1,8 +1,8 @@
 package com.imagine.imagine_book_store.enums;
 
 public enum UserRole {
-  USER("user"),
-  ADMIN("admin");
+  USER("ROLE_USER"),
+  ADMIN("ROLE_ADMIN");
 
   private String role;
 

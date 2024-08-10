@@ -9,8 +9,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,6 +26,8 @@ import com.imagine.imagine_book_store.exception.ShoppingCartNotFoundException;
 import com.imagine.imagine_book_store.repository.BookRepo;
 import com.imagine.imagine_book_store.repository.ShoppingCartRepository;
 import com.imagine.imagine_book_store.repository.UserRepository;
+
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/shopping-cart")
@@ -45,29 +50,28 @@ public class ShoppingCartController {
     return ResponseEntity.ok().body(shoppingCart.getBooks());
   }
 
-  @PostMapping("")
-  public ResponseEntity<?> createShoppingCart(@AuthenticationPrincipal User user) {
-    if(user == null){
-      throw new AccessDeniedException("Access Denied");
+  @PutMapping("/{bookId}")
+  public ResponseEntity<?> addBookToShoppingCart(@AuthenticationPrincipal User user, @PathVariable Long bookId) {
+    ShoppingCart shoppingCart = shoppingCartRepository.findById(user.getId())
+    .orElseThrow(() -> new ShoppingCartNotFoundException(user.getId()));
+    Book book = bookRepository.findById(bookId).orElseThrow(() -> new BookNotFoundException(bookId));
+    if(!shoppingCart.getBooks().contains(book)){
+      shoppingCart.addBook(book);
+      shoppingCartRepository.save(shoppingCart);
     }
-    if(shoppingCartRepository.findById(user.getId()) != null){
-      return ResponseEntity.status(HttpStatus.CREATED).build();
-    }
-    ShoppingCart shoppingCart = new ShoppingCart();
-    user.setShoppingCart(shoppingCart);
-    shoppingCart.setUser(userRepository.getReferenceById(user.getId()));
-    shoppingCart = shoppingCartRepository.save(new ShoppingCart());
-    return ResponseEntity.status(HttpStatus.CREATED).build();
+    return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
 
-  @PostMapping("/{shoppingCartId}/book/{bookId}")
-  public ResponseEntity<?> addBook(@RequestParam Long shoppingCartId, @RequestParam Long bookId) {
-    ShoppingCart shoppingCart = shoppingCartRepository.findById(shoppingCartId)
-        .orElseThrow(() -> new ShoppingCartNotFoundException(shoppingCartId));
+  @DeleteMapping("/{bookId}")
+  public ResponseEntity<?> removeBookToShoppingCart(@AuthenticationPrincipal User user, @PathVariable Long bookId) {
+    ShoppingCart shoppingCart = shoppingCartRepository.findById(user.getId())
+    .orElseThrow(() -> new ShoppingCartNotFoundException(user.getId()));
     Book book = bookRepository.findById(bookId).orElseThrow(() -> new BookNotFoundException(bookId));
-    shoppingCart.addBook(book);
-    shoppingCartRepository.save(shoppingCart);
-    return ResponseEntity.status(HttpStatus.CREATED).build();
+    if(shoppingCart.getBooks().contains(book)){
+      shoppingCart.removeBook(book);
+      shoppingCartRepository.save(shoppingCart);
+    }
+    return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
 
 }

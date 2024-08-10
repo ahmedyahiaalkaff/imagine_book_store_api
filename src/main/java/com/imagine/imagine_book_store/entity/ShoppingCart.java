@@ -3,8 +3,11 @@ package com.imagine.imagine_book_store.entity;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.data.repository.cdi.Eager;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
@@ -12,6 +15,7 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.MapsId;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
+import jakarta.transaction.Transactional;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -23,7 +27,7 @@ public class ShoppingCart {
   @Column(name = "user_id")
   private long id;
 
-  @OneToMany
+  @OneToMany()
   private final List<Book> books;
 
   @OneToOne
@@ -40,5 +44,11 @@ public class ShoppingCart {
 
   public void removeBook(Book book) {
     this.books.remove(book);
+  }
+
+  @Override
+  @Transactional
+  public String toString(){
+    return "ShoppingCart: "+this.id;
   }
 }
