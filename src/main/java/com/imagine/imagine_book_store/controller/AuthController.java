@@ -15,6 +15,7 @@ import com.imagine.imagine_book_store.auth.TokenProvider;
 import com.imagine.imagine_book_store.dtos.JwtDTO;
 import com.imagine.imagine_book_store.dtos.UserSigninDTO;
 import com.imagine.imagine_book_store.dtos.UserSignupDTO;
+import com.imagine.imagine_book_store.entity.ShoppingCart;
 import com.imagine.imagine_book_store.entity.User;
 
 import jakarta.validation.Valid;

@@ -1,6 +1,8 @@
 spring:
   application:
     name: imagine_book_store
+  profiles:
+    active: 'dev'
 
 server:
   port: 8080

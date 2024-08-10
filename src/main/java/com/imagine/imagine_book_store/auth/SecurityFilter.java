@@ -3,9 +3,16 @@ package com.imagine.imagine_book_store.auth;
 import java.io.IOException;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer.ContentTypeOptionsConfig;
+import org.springframework.security.config.annotation.web.headers.ContentTypeOptionsDsl;
+import org.springframework.security.config.web.server.ServerHttpSecurity.HeaderSpec.ContentTypeOptionsSpec;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.web.server.header.ContentTypeOptionsServerHttpHeadersWriter;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -29,14 +36,24 @@ public class SecurityFilter extends OncePerRequestFilter {
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
       throws ServletException, IOException {
-    String token = extractToken(request);
-    if(token != null){
-      String userName = tokenProvider.validateToken(token);
-      User user = userRepository.findByEmail(userName);
-      Authentication authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
-      SecurityContextHolder.getContext().setAuthentication(authentication);
+    try {
+      String token = extractToken(request);
+      if (token != null) {
+        String userName = tokenProvider.validateToken(token);
+        User user = userRepository.findByEmail(userName);
+        if (user != null) {
+          Authentication authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+          SecurityContextHolder.getContext().setAuthentication(authentication);
+        }
+      }
+      filterChain.doFilter(request, response);
+    } catch (Exception e) {
+      e.printStackTrace();
+      response.setStatus(HttpStatus.FORBIDDEN.value());
+      response.setHeader("Content-Type", "application/json");
+      response.getWriter().write("{\"error\":\"" + e.getLocalizedMessage() + "\"}");
     }
-    filterChain.doFilter(request, response);
+
   }
 
   private String extractToken(HttpServletRequest request) {
