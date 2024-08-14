@@ -80,6 +80,18 @@ public class ExceptionAdvice {
     return Map.of("error", ex.getMessage());
   }
 
+  @ExceptionHandler(UserNotFoundException.class)
+  @ResponseStatus(HttpStatus.FORBIDDEN)
+  Map<String, String> handleUserNotFoundException(UserNotFoundException ex) {
+    return Map.of("error", ex.getMessage());
+  }
+
+  @ExceptionHandler(ShoppingCartEmptyException.class)
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  Map<String, String> handleUserNotFoundException(ShoppingCartEmptyException ex) {
+    return Map.of("error", ex.getMessage());
+  }
+
   @ExceptionHandler({Exception.class, NullPointerException.class})
   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
   Map<String, String> handleException(Throwable ex) {
