@@ -27,6 +27,7 @@ public class AuthConfig {
         .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .authorizeHttpRequests(authorize -> authorize
             .requestMatchers("/shopping-cart/**").hasRole("USER")
+            .requestMatchers("/order/**").hasRole("USER")
             .requestMatchers("/books/**").hasRole("ADMIN")
             .requestMatchers("/**").permitAll()
             .anyRequest().authenticated())

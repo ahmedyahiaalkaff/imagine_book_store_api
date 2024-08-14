@@ -7,4 +7,5 @@ import com.imagine.imagine_book_store.entity.User;
 public interface UserRepository extends JpaRepository<User, Long>{
 
   public User findByEmail(String email);
+  
 }
