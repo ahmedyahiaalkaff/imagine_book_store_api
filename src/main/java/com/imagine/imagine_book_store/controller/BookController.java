@@ -21,12 +21,14 @@ public class BookController {
   private BookRepo repository;
 
   @GetMapping("")
-  public List<Book> getAllBooks(@RequestParam String title, @RequestParam String author, @RequestParam String genre){
+  public List<Book> getAllBooks(@RequestParam(required = false, defaultValue = "") String title,
+      @RequestParam(required = false, defaultValue = "") String author,
+      @RequestParam(required = false, defaultValue = "") String genre) {
     return repository.findByTitleContainingAndAuthorContainingAndGenreContainingAllIgnoreCase(title, author, genre);
   }
 
   @GetMapping("/{id}")
-  public Book getBookById(@PathVariable Long id){
-    return repository.findById(id).orElseThrow(()->new BookNotFoundException(id));
+  public Book getBookById(@PathVariable Long id) {
+    return repository.findById(id).orElseThrow(() -> new BookNotFoundException(id));
   }
 }

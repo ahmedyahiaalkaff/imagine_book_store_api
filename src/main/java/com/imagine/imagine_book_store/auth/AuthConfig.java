@@ -3,6 +3,7 @@ package com.imagine.imagine_book_store.auth;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -28,7 +29,8 @@ public class AuthConfig {
         .authorizeHttpRequests(authorize -> authorize
             .requestMatchers("/shopping-cart/**").hasRole("USER")
             .requestMatchers("/order/**").hasRole("USER")
-            .requestMatchers("/books/**").hasRole("ADMIN")
+            .requestMatchers(HttpMethod.GET, "/book/**").hasRole("USER")
+            .requestMatchers( "/book/**").hasRole("ADMIN")
             .requestMatchers("/**").permitAll()
             .anyRequest().authenticated())
         .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class).build();
