@@ -34,6 +34,10 @@ public class AuthService implements UserDetailsService{
   }
 
   public User signup(UserSignupDTO userData) throws InvalidRequestException{
+    return this.signup(userData, UserRole.USER);
+  }
+
+  public User signup(UserSignupDTO userData, UserRole userRole)throws InvalidRequestException{
     User user = userRepository.findByEmail(userData.email());
     if(user != null){
       throw new InvalidRequestException("Email already exists");
@@ -43,7 +47,7 @@ public class AuthService implements UserDetailsService{
     newUser.setEmail(userData.email());
     newUser.setPassword(encryptedPassword);
     newUser.setName(userData.name());
-    newUser.setRole(UserRole.USER);
+    newUser.setRole(userRole);
     newUser = userRepository.save(newUser);
     ShoppingCart shoppingCart = new ShoppingCart();
     shoppingCart.setId(newUser.getId());

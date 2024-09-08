@@ -31,12 +31,14 @@ public class LoadDatabase {
   @Bean
   CommandLineRunner initDatabase(BookRepo bookRepository, UserRepository userRepository, ShoppingCartRepository shoppingCartRepository) {
     return args -> {
-      logger.info("PreLoading " + bookRepository.save(new Book("Moby-Dick", "Herman Melville", " Adventure fiction", 100)));
+      logger.info("PreLoading " + bookRepository.save(new Book("Moby-Dick", "Herman Melville", " Adventure fiction", 100, 1)));
       logger.info("PreLoading "
-          + bookRepository.save(new Book("The Pirates! in an Adventure with Whaling", "Gideon Defoe", "Humor", 80)));
+          + bookRepository.save(new Book("The Pirates! in an Adventure with Whaling", "Gideon Defoe", "Humor", 80, 1)));
 
       User user = authService.signup(new UserSignupDTO("user", "user@example.com", "mylongpassword"));
       logger.info("creating user " + user);
+      User adminUser = authService.signup(new UserSignupDTO("admin", "admin@example.com", "mylongpassword"), UserRole.ADMIN);
+      logger.info("creating admin user " + adminUser);
     };
   }
 }

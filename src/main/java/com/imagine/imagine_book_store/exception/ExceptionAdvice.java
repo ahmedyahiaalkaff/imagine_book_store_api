@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.FieldError;
@@ -92,13 +93,17 @@ public class ExceptionAdvice {
     return Map.of("error", ex.getMessage());
   }
 
+  @ExceptionHandler({HttpMessageNotReadableException.class})
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  Map<String, String> handleHttpMessageNotReadableException(HttpMessageNotReadableException ex) {
+    return Map.of("error", ex.getLocalizedMessage());
+  }
+
   @ExceptionHandler({Exception.class, NullPointerException.class})
   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
   Map<String, String> handleException(Throwable ex) {
     ex.printStackTrace();
     return Map.of("error", "internal server error");
   }
-
-
 
 }

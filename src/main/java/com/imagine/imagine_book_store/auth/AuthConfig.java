@@ -30,7 +30,9 @@ public class AuthConfig {
             .requestMatchers("/shopping-cart/**").hasRole("USER")
             .requestMatchers("/order/**").hasRole("USER")
             .requestMatchers(HttpMethod.GET, "/book/**").hasRole("USER")
-            .requestMatchers( "/book/**").hasRole("ADMIN")
+            .requestMatchers(HttpMethod.POST, "/book/**").hasRole("ADMIN")
+            .requestMatchers(HttpMethod.PUT, "/book/**").hasRole("ADMIN")
+            .requestMatchers(HttpMethod.DELETE, "/book/**").hasRole("ADMIN")
             .requestMatchers("/**").permitAll()
             .anyRequest().authenticated())
         .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class).build();
