@@ -1,8 +1,16 @@
 package com.imagine.imagine_book_store.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import org.hibernate.query.SortDirection;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.domain.Sort.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
@@ -30,10 +38,23 @@ public class BookController {
   private BookRepo repository;
 
   @GetMapping()
-  public List<Book> getAllBooks(@RequestParam(required = false, defaultValue = "") String title,
+  public Page<Book> getAllBooks(@RequestParam(required = false, defaultValue = "") String title,
       @RequestParam(required = false, defaultValue = "") String author,
-      @RequestParam(required = false, defaultValue = "") String genre) {
-    return repository.findByTitleContainingAndAuthorContainingAndGenreContainingAllIgnoreCase(title, author, genre);
+      @RequestParam(required = false, defaultValue = "") String genre,
+      @RequestParam(required = false, defaultValue = "id,asc") String[] sort,
+      @RequestParam(required = false, defaultValue = "5") Integer pageSize,
+      @RequestParam(required = false, defaultValue = "0") Integer pageNumber) {
+        List<Order> sortOrders = new ArrayList<>();
+        if(sort[0].contains(",")){
+          for(String sortFieldAndDirection: sort){
+            String[] sortFieldAndDirectionArray = sortFieldAndDirection.split(",");
+            sortOrders.add(new Order(getDirection(sortFieldAndDirectionArray[1]), sortFieldAndDirectionArray[0]));
+          }
+        }else{
+          sortOrders.add(new Order(getDirection(sort[1]), sort[0]));
+        }
+    return repository.findByTitleContainingAndAuthorContainingAndGenreContainingAllIgnoreCase(title, author, genre,
+        PageRequest.of(pageNumber, pageSize, Sort.by(sortOrders)));
   }
 
   @GetMapping("/{id}")
@@ -42,24 +63,28 @@ public class BookController {
   }
 
   @PostMapping()
-  public ResponseEntity<Book> createBook(@RequestBody(required = true) @Valid Book book){
+  public ResponseEntity<Book> createBook(@RequestBody(required = true) @Valid Book book) {
     Book result = repository.save(book);
     return ResponseEntity.status(HttpStatus.CREATED).body(result);
   }
 
   @PutMapping("/{id}/increment/{increment}")
-  public ResponseEntity<Book> incrementStockBy(@PathVariable Long id, @PathVariable @Positive int increment){
-    Book book = repository.findById(id).orElseThrow(()-> new BookNotFoundException(id));
+  public ResponseEntity<Book> incrementStockBy(@PathVariable Long id, @PathVariable @Positive int increment) {
+    Book book = repository.findById(id).orElseThrow(() -> new BookNotFoundException(id));
     book.incrementStock(increment);
     book = repository.save(book);
     return ResponseEntity.status(HttpStatus.OK).body(book);
   }
 
   @PutMapping("/{id}/decrement/{decrement}")
-  public ResponseEntity<Book> decrementStockBy(@PathVariable Long id, @PathVariable @Positive int decrement){
-    Book book = repository.findById(id).orElseThrow(()-> new BookNotFoundException(id));
+  public ResponseEntity<Book> decrementStockBy(@PathVariable Long id, @PathVariable @Positive int decrement) {
+    Book book = repository.findById(id).orElseThrow(() -> new BookNotFoundException(id));
     book.decrementStock(decrement);
     book = repository.save(book);
     return ResponseEntity.status(HttpStatus.OK).body(book);
+  }
+
+  private Direction getDirection(String direction) {
+    return "desc".equalsIgnoreCase(direction) ? Direction.DESC : Direction.ASC;
   }
 }
